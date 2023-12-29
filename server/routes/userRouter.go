@@ -12,7 +12,5 @@ func UserRoutes(rc *gin.Engine) {
 
 	router.Use(middleware.Authenticate())
 
-	// rc.GET("/users", controller.GetUsers())
 	router.GET("/profile/:user_id", controller.GetUserProfile())
-	// rc.PUT("/profile", controller.UpdateUserProfile())
 }

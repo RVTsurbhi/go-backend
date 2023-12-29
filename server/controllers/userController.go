@@ -29,8 +29,6 @@ func SignupUser(c *gin.Context) {
 	var userInputData models.User
 
 	if err := c.BindJSON(&userInputData); err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		// log.Fatal(err)
 		e := utils.NewCustomError(http.StatusBadRequest, err.Error())
 		c.Error(e)
 		return
@@ -39,7 +37,6 @@ func SignupUser(c *gin.Context) {
 	validate := validator.New()
 	validationErr := validate.Struct(userInputData)
 	if validationErr != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": validationErr.Error()})
 		e := utils.NewCustomError(http.StatusBadRequest, validationErr.Error())
 		c.Error(e)
 		return
@@ -49,14 +46,11 @@ func SignupUser(c *gin.Context) {
 	count, err := userCollection.CountDocuments(ctx, bson.M{"email": userInputData.Email})
 	defer cancel()
 	if err != nil {
-		log.Panic(err)
-		// c.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
 		e := utils.NewCustomError(http.StatusBadGateway, err.Error())
 		c.Error(e)
 	}
 
 	if count > 0 {
-		// c.JSON(http.StatusBadGateway, gin.H{"message": "Email Already exist"})
 		e := utils.NewCustomError(http.StatusBadGateway, "Email Already Taken")
 		c.Error(e)
 		return
@@ -91,12 +85,10 @@ func SignupUser(c *gin.Context) {
 	defer cancel()
 
 	if updateErr != nil {
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": updateErr.Error()})
 		e := utils.NewCustomError(http.StatusInternalServerError, insertErr.Error())
 		c.Error(e)
 		return
 	}
-	// c.JSON(http.StatusOK, gin.H{"message": "User created successfully", "data": token})
 	utils.DataResponse(c, http.StatusOK, "User created successfully", gin.H{"data": token})
 }
 
@@ -119,14 +111,12 @@ func SignInUser(c *gin.Context) {
 	err := userCollection.FindOne(ctx, bson.M{"email": credentials.Email}).Decode(&foundUser)
 	defer cancel()
 	if err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email"})
 		e := utils.NewCustomError(http.StatusBadGateway, "Invalid email")
 		c.Error(e)
 		return
 	}
 
 	if err := utils.VerifyPassword(foundUser.Password, credentials.Password); err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
 		e := utils.NewCustomError(http.StatusBadGateway, "Invalid email or Password")
 		c.Error(e)
 		return
@@ -145,13 +135,11 @@ func SignInUser(c *gin.Context) {
 	defer cancel()
 
 	if updateErr != nil {
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": updateErr.Error()})
 		e := utils.NewCustomError(http.StatusInternalServerError, updateErr.Error())
 		c.Error(e)
 		return
 	}
 
-	// c.JSON(http.StatusOK, gin.H{"status": "success", "data": token})
 	utils.DataResponse(c, http.StatusOK, "User loggedIn successfully", gin.H{"data": token})
 }
 
@@ -167,7 +155,6 @@ func GetUserProfile() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
 		var user models.User
-		//NOTE: As golang doesn't understang json so we used decoder to decode the data
 		err := userCollection.FindOne(ctx, bson.M{"_id": userId}).Decode(&user)
 		defer cancel()
 

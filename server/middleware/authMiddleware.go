@@ -19,29 +19,6 @@ import (
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
 var userSessionCollection *mongo.Collection = database.OpenCollection(database.Client, "userSession")
 
-// func Authenticate() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		clientToken := c.Request.Header.Get("Authorization")
-// 		if clientToken == "" {
-// 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not provided"})
-// 			c.Abort()
-// 			return
-// 		}
-
-// 		claims, err := utils.ValidateToken(clientToken)
-// 		if err != "" {
-// 			c.JSON(http.StatusUnauthorized, gin.H{"error": err})
-// 			c.Abort()
-// 			return
-// 		}
-// 		c.Set("email", claims.Email)
-// 		c.Set("role", claims.Role)
-// 		c.Set("firstName", claims.FirstName)
-// 		// c.Set("uid", claims.Uid)
-// 		c.Next()
-// 	}
-// }
-
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		clientToken := c.Request.Header.Get("Authorization")

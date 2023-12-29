@@ -27,34 +27,6 @@ var userCollection *mongo.Collection = database.OpenCollection(database.Client, 
 
 var JWT_SECRET_KEY string = os.Getenv("JWT_SECRET_KEY")
 
-// func GenerateToken(email string, firstName string, role string, uid string) (signedToken string, signedRefreshToken string, err error) {
-// 	claims := &SignedDetails{
-// 		Email:     email,
-// 		FirstName: firstName,
-// 		Role:      role,
-// 		Uid:       uid,
-// 		StandardClaims: jwt.StandardClaims{
-// 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
-// 		},
-// 	}
-
-// 	refreshClaims := &SignedDetails{
-// 		StandardClaims: jwt.StandardClaims{
-// 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
-// 		},
-// 	}
-
-// 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(JWT_SECRET_KEY))
-// 	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(JWT_SECRET_KEY))
-
-// 	if err != nil {
-// 		log.Panic(err)
-// 		return
-// 	}
-
-// 	return token, refreshToken, err
-// }
-
 func GenerateToken2(email string, firstName string, role string, userId string) (string, error) {
 	claims := &SignedDetails{
 		Email:     email,
@@ -66,21 +38,13 @@ func GenerateToken2(email string, firstName string, role string, userId string) 
 		},
 	}
 
-	// refreshClaims := &SignedDetails{
-	// 	StandardClaims: jwt.StandardClaims{
-	// 		ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
-	// 	},
-	// }
-
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(JWT_SECRET_KEY))
-	// refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(JWT_SECRET_KEY))
 
 	if err != nil {
 		log.Panic(err)
 		return "", err
 	}
 	return token, err
-	// return token, refreshToken, err
 }
 
 func ValidateToken(token string) (claims *SignedDetails, msg string) {
@@ -92,10 +56,6 @@ func ValidateToken(token string) (claims *SignedDetails, msg string) {
 	if err != nil {
 		msg = err.Error()
 		return
-		// if err == jwt.ErrSignatureInvalid {
-		// 	return nil, gin.H{"message": "Invalid token signature"}
-		// }
-		// return nil, gin.H{"message": "Invalid token"}
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
@@ -103,12 +63,6 @@ func ValidateToken(token string) (claims *SignedDetails, msg string) {
 		return
 	}
 	return claims, msg
-
-	// if !tkn.Valid {
-	// 	return nil, gin.H{"message": "Invalid token"}
-	// }
-
-	// return claims, nil
 }
 
 func UpdateAllTokens(signedToken string, signedRefreshToken string, userId string) {

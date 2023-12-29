@@ -36,20 +36,10 @@ func main() {
 	server.GET("/healthchecker", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "server is running"})
 	})
-	// ErrNotFound := errors.New(http.StatusText(http.StatusNotFound)) // 404
-	// var NotFoundError = fmt.Errorf("resource could not be found")
-
-	// server.Use(
-	// 	ErrorHandler(
-	// 		Map(NotFoundError).ToStatusCode(http.StatusNotFound),
-	// 	))
 
 	server.NoRoute(func(c *gin.Context) {
-		// c.JSON(http.StatusNotFound, gin.H{"message": "Not Found"})
-		// ErrNotFound := errors.New("Not_Found")
-		// c.Error(ErrNotFound)
 		err := utils.NewCustomError(http.StatusNotFound, "Not Found")
-		c.Error(err) // Menyimpan error ke dalam konteks
+		c.Error(err)
 	})
 
 	routes.AuthRoutes(server)

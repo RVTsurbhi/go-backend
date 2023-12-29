@@ -31,9 +31,6 @@ func CreatePost(c *gin.Context) {
 	var newPost models.Post
 
 	if err := c.BindJSON(&postPayload); err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		// log.Fatal(err)
-
 		e := utils.NewCustomError(http.StatusBadRequest, err.Error())
 		c.Error(e)
 		return
@@ -42,9 +39,6 @@ func CreatePost(c *gin.Context) {
 	validate := validator.New()
 	validationErr := validate.Struct(postPayload)
 	if validationErr != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": validationErr.Error()})
-		// return
-
 		e := utils.NewCustomError(http.StatusBadRequest, validationErr.Error())
 		c.Error(e)
 		return
@@ -58,8 +52,6 @@ func CreatePost(c *gin.Context) {
 	result, insertErr := postCollection.InsertOne(ctx, postPayload)
 	defer cancel()
 	if insertErr != nil {
-		// log.Panic(insertErr)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while inserting"})
 		e := utils.NewCustomError(http.StatusInternalServerError, "Error while inserting")
 		c.Error(e)
 		return
@@ -68,13 +60,11 @@ func CreatePost(c *gin.Context) {
 	foundPostErr := postCollection.FindOne(ctx, query).Decode(&newPost)
 	defer cancel()
 	if foundPostErr != nil {
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while fetching", "error": foundPostErr})
 		e := utils.NewCustomError(http.StatusInternalServerError, foundPostErr.Error())
 		c.Error(e)
 		return
 	}
 
-	// c.JSON(http.StatusOK, gin.H{"message": "Post created", "data": newPost})
 	utils.DataResponse(c, http.StatusOK, "Post created", gin.H{"data": newPost})
 }
 
@@ -85,7 +75,6 @@ func GetPosts(c *gin.Context) {
 
 	intPage, err := strconv.Atoi(page)
 	if err != nil {
-		// c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		e := utils.NewCustomError(http.StatusInternalServerError, err.Error())
 		c.Error(e)
 		return
@@ -93,7 +82,6 @@ func GetPosts(c *gin.Context) {
 
 	intLimit, err := strconv.Atoi(limit)
 	if err != nil {
-		// c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		e := utils.NewCustomError(http.StatusInternalServerError, err.Error())
 		c.Error(e)
 		return
@@ -119,15 +107,11 @@ func GetPosts(c *gin.Context) {
 	cursor, err := postCollection.Find(ctx, bson.M{}, &opt)
 	defer cancel()
 	if err != nil {
-		// log.Panic(err)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while fetching"})
 		e := utils.NewCustomError(http.StatusInternalServerError, "Error while fetching")
 		c.Error(e)
 		return
 	}
 	if err = cursor.All(ctx, &posts); err != nil {
-		// log.Panic(err)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while fetching"})
 		e := utils.NewCustomError(http.StatusInternalServerError, "Error while fetching")
 		c.Error(e)
 		return
@@ -136,13 +120,10 @@ func GetPosts(c *gin.Context) {
 	count, countErr := postCollection.CountDocuments(ctx, bson.M{})
 	defer cancel()
 	if countErr != nil {
-		// log.Panic(countErr)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while fetching"})
 		e := utils.NewCustomError(http.StatusInternalServerError, countErr.Error())
 		c.Error(e)
 		return
 	}
-	// c.JSON(http.StatusOK, gin.H{"data": posts, "totalCount": count})
 	utils.PageResponse(c, http.StatusOK, count, skip, gin.H{"data": posts})
 }
 
@@ -155,13 +136,10 @@ func GetPostById(c *gin.Context) {
 	err := postCollection.FindOne(ctx, query).Decode(&post)
 	defer cancel()
 	if err != nil {
-		// log.Panic(err)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while fetching"})
 		e := utils.NewCustomError(http.StatusInternalServerError, "Error while fetching")
 		c.Error(e)
 		return
 	}
-	// c.JSON(http.StatusOK, gin.H{"data": post})
 	utils.DataResponse(c, http.StatusOK, "", gin.H{"data": post})
 }
 
@@ -173,9 +151,6 @@ func UpdatePost(c *gin.Context) {
 	var postPayload models.Post
 	var updatedPost models.Post
 	if err := c.BindJSON(&postPayload); err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		// log.Fatal(err)
-
 		e := utils.NewCustomError(http.StatusBadRequest, err.Error())
 		c.Error(e)
 		return
@@ -183,7 +158,6 @@ func UpdatePost(c *gin.Context) {
 	validate := validator.New()
 	validationErr := validate.Struct(postPayload)
 	if validationErr != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{"message": validationErr.Error()})
 		e := utils.NewCustomError(http.StatusBadRequest, validationErr.Error())
 		c.Error(e)
 		return
@@ -200,12 +174,9 @@ func UpdatePost(c *gin.Context) {
 	err := postCollection.FindOneAndUpdate(ctx, query, update).Decode(&updatedPost)
 	defer cancel()
 	if err != nil {
-		// log.Panic(err)
-		// c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while updating"})
 		e := utils.NewCustomError(http.StatusInternalServerError, "Error while updating")
 		c.Error(e)
 		return
 	}
-	// c.JSON(http.StatusOK, gin.H{"message": "Post updated", "data": updatedPost})
 	utils.DataResponse(c, http.StatusOK, "Post updated", gin.H{"data": updatedPost})
 }

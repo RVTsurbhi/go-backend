@@ -2,6 +2,7 @@ steps for initiating the project
 
 step 1: go mod init <module_name>
 this is similar like npm init
+
 step 2: install the package like npm install - go get github.com/gin-gonic/gin
 you will see some files got added automatically
 2.1 go.sum - its similar like package.lock.json
